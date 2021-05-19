@@ -17,7 +17,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
-public class User implements Serializable{
+public class User implements Serializable {
 
 	/**
 	 * 
@@ -26,90 +26,101 @@ public class User implements Serializable{
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
-	@GenericGenerator(name="native", strategy = "native")
+	@GenericGenerator(name = "native", strategy = "native")
 	private Long id;
 	@Column
 	private String firstName;
 	@Column
 	private String lastName;
-	@Column
+	@Column(unique = true)
 	private String email;
-	@Column
+	@Column(unique = true)
 	private String username;
 	@Column
 	private String password;
-	@Transient 
+	@Transient
 	private String confirmPassword;
-	
+
 	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name= "user_roles", 
-	 joinColumns= @JoinColumn(name="user_id"), inverseJoinColumns = @JoinColumn(name="role_id"))
-	
+	@JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles;
-	public User(Long id, String firstName, String lastNAme, String email, String username, String password,
-			String confirmPassword, Set<Role> roles) {
+
+	public User() {
 		super();
-		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastNAme;
-		this.email = email;
-		this.username = username;
-		this.password = password;
-		this.confirmPassword = confirmPassword;
-		this.roles = roles;
 	}
+
+	public User(Long id) {
+		this.id = id;
+	}
+
 	public Long getId() {
 		return id;
 	}
+
 	public void setId(Long id) {
 		this.id = id;
 	}
-	public String getFirsName() {
+
+	public String getFirstName() {
 		return firstName;
 	}
-	public void setFirsName(String firsName) {
-		this.firstName = firsName;
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
 	}
-	public String getLastNAme() {
+
+	public String getLastName() {
 		return lastName;
 	}
-	public void setLastNAme(String lastNAme) {
-		this.lastName = lastNAme;
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
+
 	public String getEmail() {
 		return email;
 	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	public String getUsuario() {
+
+	public String getUsername() {
 		return username;
 	}
-	public void setUsuario(String usuario) {
-		this.username = usuario;
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
+
 	public String getPassword() {
 		return password;
 	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
 	public String getConfirmPassword() {
 		return confirmPassword;
 	}
+
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
 	}
+
 	public Set<Role> getRoles() {
 		return roles;
 	}
+
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -124,6 +135,7 @@ public class User implements Serializable{
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -175,13 +187,16 @@ public class User implements Serializable{
 			return false;
 		return true;
 	}
+
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", firsName=" + firstName + ", lastNAme=" + lastName + ", email=" + email
-				+ ", usuario=" + username + ", password=" + password + ", confirmPassword=" + confirmPassword
-				+ ", roles=" + roles + "]";
+		return "User [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+				+ ", username=" + username + ", password=" + password + ", confirmPassword=" + confirmPassword
+				+ ", roles=" + roles + ", getId()=" + getId() + ", getFirstName()=" + getFirstName()
+				+ ", getLastName()=" + getLastName() + ", getEmail()=" + getEmail() + ", getUsername()=" + getUsername()
+				+ ", getPassword()=" + getPassword() + ", getConfirmPassword()=" + getConfirmPassword()
+				+ ", getRoles()=" + getRoles() + ", hashCode()=" + hashCode() + ", getClass()=" + getClass()
+				+ ", toString()=" + super.toString() + "]";
 	}
-	 
-	
-	
+
 }
