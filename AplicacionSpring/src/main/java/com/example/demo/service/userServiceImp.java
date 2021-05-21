@@ -47,7 +47,11 @@ public class userServiceImp implements UserService {
 
 	@Override
 	public User getUserById(Long id) throws Exception {
+<<<<<<< HEAD
 		return userRepository.findById(id).orElseThrow(() -> new Exception("El usuario no existe."));
+=======
+		return repository.findById(id).orElseThrow(() -> new Exception("El usuario no existe."));
+>>>>>>> branch 'main' of https://github.com/ecordi/AppSpringBoot.git
 	}
 
 	@Override
@@ -70,6 +74,7 @@ public class userServiceImp implements UserService {
 		to.setEmail(from.getEmail());
 		to.setRoles(from.getRoles());
 	}
+<<<<<<< HEAD
 
 	public void deleteUser(Long id) throws Exception {
 		User user = getUserById(id);
@@ -91,6 +96,12 @@ public class userServiceImp implements UserService {
 		}
 		storedUser.setPassword(form.getNewPassword());
 		return userRepository.save(storedUser);
+=======
+	
+	public void deleteUser(Long id) throws Exception{
+		User user = getUserById(id);
+		repository.delete(user);
+>>>>>>> branch 'main' of https://github.com/ecordi/AppSpringBoot.git
 		
 	}
 }
