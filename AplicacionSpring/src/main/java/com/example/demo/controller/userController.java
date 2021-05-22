@@ -6,6 +6,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.example.demo.Exception.UsernameOrIdNotFound;
 import com.example.demo.dto.ChangePasswordForm;
 import com.example.demo.entity.User;
 import com.example.demo.repository.RoleRepository;
@@ -118,13 +120,13 @@ public class userController {
 	public String cancelEditUser(ModelMap model) {
 		return "redirect:/userForm";
 	}
-	
+    @Secured("ROLE_ADMIN")
 	@GetMapping("/deleteUser/{id}")
 	public String deleteUser(Model model, @PathVariable(name ="id")Long id) {
 		try {
 			userService.deleteUser(id);
-		} catch (Exception e) {
-			model.addAttribute("deleteError","The user could not be delete");
+		} catch (UsernameOrIdNotFound e) {
+			model.addAttribute("listErrorMessage", e.getMessage());
 		}
 		return userForm(model);
 	}

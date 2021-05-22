@@ -3,11 +3,13 @@ package com.example.demo.service;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Exception.UsernameOrIdNotFound;
 import com.example.demo.dto.ChangePasswordForm;
 import com.example.demo.entity.User;
 import com.example.demo.repository.UserRepository;
@@ -51,13 +53,14 @@ public class userServiceImp implements UserService {
 	}
 
 	@Override
-	public User getUserById(Long id) throws Exception {
+	public User getUserById(Long id) throws UsernameOrIdNotFound {
 
-		return userRepository.findById(id).orElseThrow(() -> new Exception("El usuario no existe"));
+		return userRepository.findById(id).orElseThrow(() -> new UsernameOrIdNotFound("El Id del usuario no existe"));
 
 	}
 
 	@Override
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN',ROLE_USER)")
 	public User updateUser(User fromUser) throws Exception {
 		User toUser = getUserById(fromUser.getId());
 		mapUser(fromUser, toUser);
@@ -77,33 +80,34 @@ public class userServiceImp implements UserService {
 		to.setEmail(from.getEmail());
 		to.setRoles(from.getRoles());
 	}
-
-	public void deleteUser(Long id) throws Exception {
+	@Override
+	@PreAuthorize("hasRole('ADMIN')")	
+	public void deleteUser(Long id) throws UsernameOrIdNotFound {
 		User user = getUserById(id);
 		userRepository.delete(user);
 
 	}
+
 	@Override
 	public User changePassword(ChangePasswordForm form) throws Exception {
 		User user = getUserById(form.getId());
-		
-		if ( !isLoggedUserADMIN() && user.getPassword().equals(form.getCurrentPassword())) {
-			throw new Exception ("Current Password invalid.");
+
+		if (!isLoggedUserADMIN() && user.getPassword().equals(form.getCurrentPassword())) {
+			throw new Exception("Current Password invalid.");
 		}
-		
-		if( user.getPassword().equals(form.getNewPassword())) {
-			throw new Exception ("Nuevo debe ser diferente al password actual.");
+
+		if (user.getPassword().equals(form.getNewPassword())) {
+			throw new Exception("Nuevo debe ser diferente al password actual.");
 		}
-		
-		if( !form.getNewPassword().equals(form.getConfirmPassword())) {
-			throw new Exception ("Nuevo Password y Confirm Password no coinciden.");
+
+		if (!form.getNewPassword().equals(form.getConfirmPassword())) {
+			throw new Exception("Nuevo Password y Confirm Password no coinciden.");
 		}
-		
+
 		String encodePassword = bCryptPasswordEncoder.encode(form.getNewPassword());
 		user.setPassword(encodePassword);
 		return userRepository.save(user);
 	}
-	
 
 	public boolean isLoggedUserADMIN() {
 		return loggedUserHasRole("ROLE_ADMIN");
