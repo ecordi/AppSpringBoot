@@ -39,13 +39,13 @@ public class User implements Serializable{
 	@NotBlank
 	private String lastName;
 	@Column
-	@NotBlank
+	@NotBlank(message="Debe cumplir con el formato user@user.com")
 	private String email;
 	@Column
 	@NotBlank
 	private String username;
 	@Column
-	@NotBlank
+	@NotBlank(message="No puede estar vacio")
 	private String password;
 	
 	@Transient

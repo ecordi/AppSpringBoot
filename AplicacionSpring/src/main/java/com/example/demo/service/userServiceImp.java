@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Exception.CustomeFieldValidationException;
 import com.example.demo.Exception.UsernameOrIdNotFound;
 import com.example.demo.dto.ChangePasswordForm;
 import com.example.demo.entity.User;
@@ -30,14 +31,14 @@ public class userServiceImp implements UserService {
 	private boolean checkUsernameAvailable(User user) throws Exception {
 		Optional<User> userFound = userRepository.findByUsername(user.getUsername());
 		if (userFound.isPresent()) {
-			throw new Exception("Username no disponible");
+			throw new CustomeFieldValidationException ("Username no disponible","username");
 		}
 		return true;
 	}
 
 	private boolean checkPasswordValid(User user) throws Exception {
 		if (!user.getPassword().equals(user.getConfirmPassword())) {
-			throw new Exception("Password y Confirm Password no son iguales");
+			throw new CustomeFieldValidationException("Password y Confirm Password no son iguales","confirmPassword");
 		}
 		return true;
 	}
@@ -54,9 +55,7 @@ public class userServiceImp implements UserService {
 
 	@Override
 	public User getUserById(Long id) throws UsernameOrIdNotFound {
-
 		return userRepository.findById(id).orElseThrow(() -> new UsernameOrIdNotFound("El Id del usuario no existe"));
-
 	}
 
 	@Override
@@ -73,37 +72,33 @@ public class userServiceImp implements UserService {
 	 * @param from
 	 * @param to
 	 */
-	protected void mapUser(User from, User to) {
+	public void mapUser(User from, User to) {
 		to.setUsername(from.getUsername());
 		to.setFirstName(from.getFirstName());
 		to.setLastName(from.getLastName());
 		to.setEmail(from.getEmail());
 		to.setRoles(from.getRoles());
 	}
+	
 	@Override
-	@PreAuthorize("hasRole('ADMIN')")	
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN')")	
 	public void deleteUser(Long id) throws UsernameOrIdNotFound {
 		User user = getUserById(id);
 		userRepository.delete(user);
-
 	}
 
 	@Override
 	public User changePassword(ChangePasswordForm form) throws Exception {
 		User user = getUserById(form.getId());
-
 		if (!isLoggedUserADMIN() && user.getPassword().equals(form.getCurrentPassword())) {
 			throw new Exception("Current Password invalid.");
 		}
-
 		if (user.getPassword().equals(form.getNewPassword())) {
 			throw new Exception("Nuevo debe ser diferente al password actual.");
 		}
-
 		if (!form.getNewPassword().equals(form.getConfirmPassword())) {
 			throw new Exception("Nuevo Password y Confirm Password no coinciden.");
 		}
-
 		String encodePassword = bCryptPasswordEncoder.encode(form.getNewPassword());
 		user.setPassword(encodePassword);
 		return userRepository.save(user);

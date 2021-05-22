@@ -18,7 +18,6 @@ public class Role implements Serializable{
 	 */
 	private static final long serialVersionUID = 6353963609310956029L;
 
-
 	@Id
 	@GeneratedValue(strategy= GenerationType.AUTO, generator="native")
 	@GenericGenerator(name="native",strategy="native")
@@ -95,6 +94,4 @@ public class Role implements Serializable{
 	public String toString() {
 		return "Role [id=" + id + ", name=" + name + ", description=" + description + "]";
 	}
-
-
 }

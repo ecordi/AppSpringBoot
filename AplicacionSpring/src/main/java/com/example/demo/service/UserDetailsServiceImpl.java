@@ -28,7 +28,6 @@ public class UserDetailsServiceImpl implements UserDetailsService{
 		//Buscar nombre de usuario en nuestra base de datos
 		com.example.demo.entity.User appUser = 
 	                 userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User does not exist!"));
-		
 	    Set grantList = new HashSet(); 
 	    
 	    //Crear la lista de los roles/accessos que tienen el usuarios

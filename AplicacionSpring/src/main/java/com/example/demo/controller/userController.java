@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import com.example.demo.Exception.CustomeFieldValidationException;
 import com.example.demo.Exception.UsernameOrIdNotFound;
 import com.example.demo.dto.ChangePasswordForm;
 import com.example.demo.entity.User;
@@ -47,7 +48,7 @@ public class userController {
 	}
 
 	@PostMapping("/userForm")
-	public String createUser(@Valid @ModelAttribute("userForm") User user, BindingResult result, ModelMap model) {
+	public String createUser(@Valid @ModelAttribute("userForm") User user, BindingResult result, ModelMap model) throws Exception {
 		if (result.hasErrors()) {
 			model.addAttribute("userForm", user);
 			model.addAttribute("formTab", "active");
@@ -56,8 +57,14 @@ public class userController {
 				userService.createUser(user);
 				model.addAttribute("userForm", new User());
 				model.addAttribute("listTab", "active");
-
-			} catch (Exception e) {
+			} catch (CustomeFieldValidationException e) {
+				result.rejectValue(e.getFieldName(), null, e.getMessage());
+ 				model.addAttribute("userForm", user);
+				model.addAttribute("formTab", "active");
+				model.addAttribute("userList", userService.getAllUsers());
+				model.addAttribute("roles", roleRepository.findAll());
+			}
+			catch (Exception e) {
 				model.addAttribute("formErrorMessage", e.getMessage());
 				model.addAttribute("userForm", user);
 				model.addAttribute("formTab", "active");
@@ -65,7 +72,6 @@ public class userController {
 				model.addAttribute("roles", roleRepository.findAll());
 			}
 		}
-
 		model.addAttribute("userList", userService.getAllUsers());
 		model.addAttribute("roles", roleRepository.findAll());
 		return "user-form/user-view";
@@ -74,17 +80,15 @@ public class userController {
 	@GetMapping("/editUser/{id}")
 	public String getEditUserForm(Model model, @PathVariable(name = "id") Long id) throws Exception {
 		User userToEdit = userService.getUserById(id);
-		
 		model.addAttribute("userForm", userToEdit);
 		model.addAttribute("userList", userService.getAllUsers());
 		model.addAttribute("roles", roleRepository.findAll());
 		model.addAttribute("formTab", "active");
 		model.addAttribute("editMode", "true");
 		model.addAttribute("passwordForm",new ChangePasswordForm(id));
-
 		return "user-form/user-view";
-
 	}
+	
 	@PostMapping("/editUser")
 	public String postEditUserForm(@Valid @ModelAttribute("userForm")User user, BindingResult result, ModelMap model) {
 		if(result.hasErrors()) {
@@ -92,7 +96,6 @@ public class userController {
 			model.addAttribute("formTab","active");
 			model.addAttribute("editMode","true");
 			model.addAttribute("passwordForm",new ChangePasswordForm(user.getId()));
-
 		}else {
 			try {
 				userService.updateUser(user);
@@ -106,21 +109,18 @@ public class userController {
 				model.addAttribute("roles",roleRepository.findAll());
 				model.addAttribute("editMode","true");
 				model.addAttribute("passwordForm",new ChangePasswordForm(user.getId()));
-
 			}
 		}
-
 		model.addAttribute("userList", userService.getAllUsers());
 		model.addAttribute("roles",roleRepository.findAll());
 		return "user-form/user-view";
-
 	}
 
 	@GetMapping("/userForm/cancel")
 	public String cancelEditUser(ModelMap model) {
 		return "redirect:/userForm";
 	}
-    @Secured("ROLE_ADMIN")
+ 
 	@GetMapping("/deleteUser/{id}")
 	public String deleteUser(Model model, @PathVariable(name ="id")Long id) {
 		try {
@@ -139,7 +139,6 @@ public class userController {
 	            String result = errors.getAllErrors()
 	                        .stream().map(x -> x.getDefaultMessage())
 	                        .collect(Collectors.joining(""));
-
 	            throw new Exception(result);
 	        }	
 			userService.changePassword(form);
