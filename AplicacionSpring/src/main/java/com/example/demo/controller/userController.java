@@ -30,7 +30,7 @@ public class userController {
 	@Autowired
 	RoleRepository roleRepository;
 
-	@GetMapping("/")
+	@GetMapping({"/","/login"})
 	public String index() {
 		return "index";
 	}
@@ -128,7 +128,7 @@ public class userController {
 		}
 		return userForm(model);
 	}
-<<<<<<< HEAD
+
 	@PostMapping("/editUser/changePassword")
 	public ResponseEntity<String> changePassword(@Valid @RequestBody ChangePasswordForm form, Errors errors) {
 		try {
@@ -146,6 +146,5 @@ public class userController {
 		}
 		return ResponseEntity.ok("success");
 	}
-=======
->>>>>>> branch 'main' of https://github.com/ecordi/AppSpringBoot.git
+
 }
