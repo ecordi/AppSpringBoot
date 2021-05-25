@@ -18,7 +18,7 @@ import com.example.demo.repository.UserRepository;
 @Service
 public class userServiceImp implements UserService {
 
-	@Autowired
+	@Autowired(required = true)
 	BCryptPasswordEncoder bCryptPasswordEncoder;
 	@Autowired
 	UserRepository userRepository;
@@ -59,7 +59,7 @@ public class userServiceImp implements UserService {
 	}
 
 	@Override
-	@PreAuthorize("hasAnyRole('ROLE_ADMIN',ROLE_USER)")
+	@PreAuthorize("hasAnyRole('ROLE_ADMIN','ROLE_USER')")
 	public User updateUser(User fromUser) throws Exception {
 		User toUser = getUserById(fromUser.getId());
 		mapUser(fromUser, toUser);
